@@ -24,7 +24,12 @@ var mrCreateCmd = &cobra.Command{
 	Use:     "create [target_remote [target_branch]]",
 	Aliases: []string{"new"},
 	Short:   "Creates a merge request.",
-	Args:    cobra.MaximumNArgs(2),
+	Long: `Creates a merge request for the currently checked out branch.
+
+Target remote and branch can be specified as arguments. If none are given,
+origin and master will be used. The source remote will be the tracking remote
+for the current branch.`,
+	Args: cobra.MaximumNArgs(2),
 	Example: heredoc.Doc(`
 		lab mr create target_remote
 		lab mr create target_remote target_branch --allow-collaboration
