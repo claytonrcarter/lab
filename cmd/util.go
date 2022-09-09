@@ -315,14 +315,14 @@ func getRemoteName(remote string) (string, error) {
 // This function returns a string and number.
 func parseArgsStringAndID(args []string) (string, int64, error) {
 	if len(args) == 2 {
-		n, err := strconv.ParseInt(args[1], 0, 64)
+		n, err := strconv.ParseInt(strings.TrimLeft(args[1], "!#"), 0, 64)
 		if err != nil {
 			return args[0], 0, err
 		}
 		return args[0], n, nil
 	}
 	if len(args) == 1 {
-		n, err := strconv.ParseInt(args[0], 0, 64)
+		n, err := strconv.ParseInt(strings.TrimLeft(args[0], "!#"), 0, 64)
 		if err != nil {
 			return args[0], 0, nil
 		}
