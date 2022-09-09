@@ -63,7 +63,7 @@ var issueShowCmd = &cobra.Command{
 		if showFull || showComments && showActivities {
 			noteLevel = NoteLevelFull
 		} else if showComments {
-			noteLevel = NoteLevelComments
+			noteLevel = NoteLevelAllComments
 		} else if showActivities {
 			noteLevel = NoteLevelActivities
 		}

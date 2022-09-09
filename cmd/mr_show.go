@@ -84,13 +84,16 @@ var mrShowCmd = &cobra.Command{
 		var noteLevel = NoteLevelNone
 
 		showComments, _ := cmd.Flags().GetBool("comments")
+		showResolved, _ := cmd.Flags().GetString("resolved")
 		showActivities, _ := cmd.Flags().GetBool("activities")
 		showFull, _ := cmd.Flags().GetBool("full")
 
 		if showFull || showComments && showActivities {
 			noteLevel = NoteLevelFull
-		} else if showComments {
-			noteLevel = NoteLevelComments
+		} else if showComments && showResolved == "show" {
+			noteLevel = NoteLevelAllComments
+		} else if showComments && showResolved == "hide" {
+			noteLevel = NoteLevelOpenComments
 		} else if showActivities {
 			noteLevel = NoteLevelActivities
 		}
@@ -306,6 +309,7 @@ func init() {
 	mrShowCmd.Flags().BoolP("comments", "c", false, "show only comments for the merge request (does not work with --patch)")
 	mrShowCmd.Flags().BoolP("activities", "a", false, "show only activities for the merge request (does not work with --patch)")
 	mrShowCmd.Flags().BoolP("full", "f", false, "show both activities and comments for the merge request (does not work with --patch)")
+	mrShowCmd.Flags().StringP("resolved", "", "show", "show resolved discussions (show/hide)")
 	mrShowCmd.Flags().StringP("since", "s", "", "show comments since specified date (format: 2020-08-21 14:57:46.808 +0000 UTC)")
 	mrShowCmd.Flags().BoolVarP(&mrShowPatch, "patch", "p", false, "show MR patches (does not work with --comments)")
 	mrShowCmd.Flags().BoolVarP(&mrShowPatchReverse, "reverse", "", false, "reverse order when showing MR patches (chronological instead of anti-chronological)")

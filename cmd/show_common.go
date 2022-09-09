@@ -243,7 +243,8 @@ func getTermRenderer(style glamour.TermRendererOption) (*glamour.TermRenderer, e
 
 const (
 	NoteLevelNone = iota
-	NoteLevelComments
+	NoteLevelAllComments
+	NoteLevelOpenComments
 	NoteLevelActivities
 	NoteLevelFull
 )
@@ -276,7 +277,7 @@ func printDiscussions(project string, discussions []*gitlab.Discussion, since st
 	for _, discussion := range discussions {
 		for i, note := range discussion.Notes {
 			if (noteLevel == NoteLevelActivities && note.System == false) ||
-				(noteLevel == NoteLevelComments && note.System == true) {
+				((noteLevel == NoteLevelAllComments || noteLevel == NoteLevelOpenComments) && note.System == true) {
 				continue
 			}
 			indentHeader, indentNote := "", ""
@@ -351,9 +352,7 @@ func printDiscussions(project string, discussions []*gitlab.Discussion, since st
 `,
 				indentHeader, note.ID, note.Author.Username, commented, time.Time(*note.UpdatedAt).String())
 
-			showResolved := false
-
-			if !note.Resolved || note.Resolved && showResolved {
+			if !note.Resolved || note.Resolved && noteLevel == NoteLevelAllComments {
 				if note.Position != nil && i == 0 {
 					displayCommitDiscussion(project, idNum, note)
 				}
@@ -363,7 +362,7 @@ func printDiscussions(project string, discussions []*gitlab.Discussion, since st
 			}
 
 			if note.Resolved {
-				if i == len(discussion.Notes)-1 || !showResolved {
+				if i == len(discussion.Notes)-1 || noteLevel == NoteLevelOpenComments {
 					commented := "resolved discussion"
 					printit(`%s%s %s %s
 
@@ -371,7 +370,7 @@ func printDiscussions(project string, discussions []*gitlab.Discussion, since st
 						indentHeader, note.ResolvedBy.Username, commented, time.Time(*note.ResolvedAt).String())
 				}
 
-				if !showResolved {
+				if noteLevel == NoteLevelOpenComments {
 					break
 				}
 			}
