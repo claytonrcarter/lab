@@ -350,13 +350,31 @@ func printDiscussions(project string, discussions []*gitlab.Discussion, since st
 
 `,
 				indentHeader, note.ID, note.Author.Username, commented, time.Time(*note.UpdatedAt).String())
-			if note.Position != nil && i == 0 {
-				displayCommitDiscussion(project, idNum, note)
-			}
-			printit(`%s%s
-`,
 
-				indentNote, noteBody)
+			showResolved := false
+
+			if !note.Resolved || note.Resolved && showResolved {
+				if note.Position != nil && i == 0 {
+					displayCommitDiscussion(project, idNum, note)
+				}
+				printit(`%s%s
+`,
+					indentNote, noteBody)
+			}
+
+			if note.Resolved {
+				if i == len(discussion.Notes)-1 || !showResolved {
+					commented := "resolved discussion"
+					printit(`%s%s %s %s
+
+`,
+						indentHeader, note.ResolvedBy.Username, commented, time.Time(*note.ResolvedAt).String())
+				}
+
+				if !showResolved {
+					break
+				}
+			}
 		}
 	}
 
