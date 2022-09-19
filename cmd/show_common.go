@@ -178,6 +178,15 @@ func displayCommitDiscussion(project string, idNum int64, note *gitlab.Note) {
 
 	// In some cases the CommitID field is still not populated correctly.
 	// In those cases use the HeadSHA value instead of the CommitID.
+
+	// [CRC Sep 18, 2022]
+	// Actually, I think what might be most correct is to
+	// 1. Get all diff versions via https://docs.gitlab.com/ee/api/merge_requests.html#get-mr-diff-versions
+	// 2. Find the versions that match the base & head SHA of each Note
+	// 3. Get *that* diff via https://docs.gitlab.com/ee/api/merge_requests.html#get-a-single-mr-diff-version
+	//
+	// But most notes will share SHAs, so that seems like something that could be cached
+
 	commitID := note.CommitID
 	if commitID == "" {
 		commitID = note.Position.HeadSHA
@@ -209,8 +218,22 @@ func displayCommitDiscussion(project string, idNum int64, note *gitlab.Note) {
 			newLine := note.Position.NewLine
 			oldLine := note.Position.OldLine
 			if note.Position.LineRange != nil {
-				newLine = note.Position.LineRange.StartRange.NewLine
-				oldLine = note.Position.LineRange.StartRange.OldLine
+				// This offset is an attempt to deal with the fact that the
+				// ranges included in note.Position refer to the position w/i
+				// the diff when the comment was created, but the SHAs included
+				// in note.Position seem to always refer to the current/latest
+				// version. Even though we can't show the exact right context,
+				// we can at least show the correct position.
+				newOffset := 0
+				oldOffset := 0
+				if note.Position.NewLine != note.Position.LineRange.EndRange.NewLine {
+					newOffset = note.Position.NewLine - note.Position.LineRange.EndRange.NewLine
+				}
+				if note.Position.OldLine != note.Position.LineRange.EndRange.OldLine {
+					oldOffset = note.Position.OldLine - note.Position.LineRange.EndRange.OldLine
+				}
+				newLine = note.Position.LineRange.EndRange.NewLine + newOffset
+				oldLine = note.Position.LineRange.EndRange.OldLine + oldOffset
 			}
 			diffstring := displayDiff(d.Diff, newLine, oldLine, false)
 			fmt.Printf(diffstring)
