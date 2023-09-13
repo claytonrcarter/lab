@@ -421,6 +421,15 @@ func MRCreateNote(projID interface{}, id int64, opts *gitlab.CreateMergeRequestN
 	return fmt.Sprintf("%s/-/merge_requests/%d#note_%d", p.WebURL, note.NoteableIID, note.ID), nil
 }
 
+// MRCreatePipeline creates a merge request pipeline for given MR
+func MRCreatePipeline(projID interface{}, mrID int) (*gitlab.PipelineInfo, error) {
+	p, _, err := lab.MergeRequests.CreateMergeRequestPipeline(projID, mrID)
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
 // MRGet retrieves the merge request from GitLab project
 func MRGet(projID interface{}, id int64) (*gitlab.MergeRequest, error) {
 	mr, _, err := lab.MergeRequests.GetMergeRequest(projID, id, nil)

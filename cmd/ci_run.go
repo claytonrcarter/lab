@@ -22,26 +22,49 @@ var ciCreateCmd = &cobra.Command{
 	Short:   "Create a CI pipeline",
 	Long: heredoc.Doc(`
 		Run the CI pipeline for the given or current branch if none provided.
-		This API uses your GitLab token to create CI pipelines
+		Project will be inferred from branch if not provided.
 
-		Project will be inferred from branch if not provided
+		If project uses merge request pipelines, the --merge-request flag can
+		be used to create merge request pipelines for a given MR, or the MR for
+		the current branch, if none is provided..
 
 		Note: "lab ci create" differs from "lab ci trigger" which is a
 		different API`),
 	Example: heredoc.Doc(`
 		lab ci create feature_branch
-		lab ci create -p engineering/integration_tests master`),
+		lab ci create -p engineering/integration_tests master
+		lab ci create --merge-request
+		lab ci create 123 --merge-request`),
 	PersistentPreRun: labPersistentPreRun,
 	Run: func(cmd *cobra.Command, args []string) {
-		pid, branch, err := getCIRunOptions(cmd, args)
+		forMR, err := cmd.Flags().GetBool("merge-request")
 		if err != nil {
 			log.Fatal(err)
 		}
-		pipeline, err := lab.CICreate(pid, &gitlab.CreatePipelineOptions{Ref: &branch})
-		if err != nil {
-			log.Fatal(err)
+
+		if forMR {
+			pid, mrid, err := parseArgsWithGitBranchMR(args)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			pipeline, err := lab.MRCreatePipeline(pid, int(mrid))
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(pipeline.WebURL)
+		} else {
+			pid, branch, err := getCIRunOptions(cmd, args)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			pipeline, err := lab.CICreate(pid, &gitlab.CreatePipelineOptions{Ref: &branch})
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(pipeline.WebURL)
 		}
-		fmt.Println(pipeline.WebURL)
 	},
 }
 
@@ -139,6 +162,7 @@ func parseCIVariables(vars []string) (map[string]string, error) {
 
 func init() {
 	ciCreateCmd.Flags().StringP("project", "p", "", "project to create pipeline on")
+	ciCreateCmd.Flags().Bool("merge-request", false, "use merge request pipeline, if enabled")
 	ciCmd.AddCommand(ciCreateCmd)
 	carapace.Gen(ciCreateCmd).PositionalCompletion(
 		action.Remotes(),
