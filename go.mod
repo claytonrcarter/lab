@@ -6,6 +6,7 @@ require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/charmbracelet/glamour v0.6.0
+	github.com/dustin/go-humanize v1.0.1
 	github.com/fatih/color v1.16.0
 	github.com/gdamore/tcell/v2 v2.7.0
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510

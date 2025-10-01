@@ -11,6 +11,7 @@ import (
 	"github.com/araddon/dateparse"
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/glamour/ansi"
+	humanize "github.com/dustin/go-humanize"
 	"github.com/fatih/color"
 	"github.com/jaytaylor/html2text"
 	"github.com/muesli/termenv"
@@ -315,9 +316,9 @@ func printDiscussions(project string, discussions []*gitlab.Discussion, since st
 				// note.ID
 				printit(
 					heredoc.Doc(`
-						* %s %s at %s
+						* %s %s %s
 					`),
-					note.Author.Username, splitNote[0], time.Time(*note.UpdatedAt).String())
+					note.Author.Username, splitNote[0], humanize.Time(*note.UpdatedAt))
 				if len(splitNote) == 2 {
 					if renderMarkdown {
 						splitNote[1], _ = mdRenderer.Render(splitNote[1])
@@ -347,10 +348,10 @@ func printDiscussions(project string, discussions []*gitlab.Discussion, since st
 			}
 			noteBody = strings.Replace(noteBody, "\n", "\n"+indentNote, -1)
 
-			printit(`%s#%d: %s %s at %s
+			printit(`%s#%d: %s %s %s
 
 `,
-				indentHeader, note.ID, note.Author.Username, commented, time.Time(*note.UpdatedAt).String())
+				indentHeader, note.ID, note.Author.Username, commented, humanize.Time(*note.UpdatedAt))
 
 			if !note.Resolved || note.Resolved && noteLevel == NoteLevelAllComments {
 				if note.Position != nil && i == 0 {
@@ -367,7 +368,7 @@ func printDiscussions(project string, discussions []*gitlab.Discussion, since st
 					printit(`%s%s %s %s
 
 `,
-						indentHeader, note.ResolvedBy.Username, commented, time.Time(*note.ResolvedAt).String())
+						indentHeader, note.ResolvedBy.Username, commented, humanize.Time(*note.ResolvedAt))
 				}
 
 				if noteLevel == NoteLevelOpenComments {
