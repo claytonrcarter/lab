@@ -113,16 +113,13 @@ func issueList(args []string) ([]*gitlab.Issue, error) {
 			log.Fatalf("%s user not found\n", issueAssignee)
 		}
 		issueAssigneeID = gitlab.AssigneeID(*assigneeID)
+	} else {
+		issueAssigneeID = nil
 	}
 
 	orderBy := gitlab.Ptr(issueOrder)
 
 	sort := gitlab.Ptr(issueSortedBy)
-
-	intIssueAssigneeID, err := strconv.ParseInt(fmt.Sprintf("%v", issueAssigneeID), 10, 0)
-	if err != nil {
-		log.Fatalf("issueAssigneeID (%s) cannot be converted to int", issueAssigneeID)
-	}
 
 	opts := gitlab.ListProjectIssuesOptions{
 		ListOptions: gitlab.ListOptions{
@@ -134,7 +131,7 @@ func issueList(args []string) ([]*gitlab.Issue, error) {
 		OrderBy:    orderBy,
 		Sort:       sort,
 		AuthorID:   issueAuthorID,
-		AssigneeID: gitlab.AssigneeID(intIssueAssigneeID),
+		AssigneeID: issueAssigneeID,
 	}
 
 	if issueExactMatch {
