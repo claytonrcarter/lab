@@ -412,9 +412,9 @@ func mrList(args []string) ([]*gitlab.BasicMergeRequest, error) {
 		mrReviewerID = gitlab.ReviewerID(*reviewerID)
 	}
 
-	orderBy := gitlab.String(mrOrder)
+	orderBy := gitlab.Ptr(mrOrder)
 
-	sort := gitlab.String(mrSortedBy)
+	sort := gitlab.Ptr(mrSortedBy)
 
 	// if none of the flags are set, return every single MR
 	mrCheckConflicts := (mrConflicts || mrNoConflicts)
@@ -429,14 +429,14 @@ func mrList(args []string) ([]*gitlab.BasicMergeRequest, error) {
 		AuthorID:               mrAuthorID,
 		ApprovedByIDs:          mrApproverID,
 		AssigneeID:             mrAssigneeID,
-		WithMergeStatusRecheck: gitlab.Bool(mrCheckConflicts),
+		WithMergeStatusRecheck: gitlab.Ptr(mrCheckConflicts),
 		ReviewerID:             mrReviewerID,
 	}
 
 	if mrDraft && !mrReady {
-		opts.WIP = gitlab.String("yes")
+		opts.WIP = gitlab.Ptr("yes")
 	} else if mrReady && !mrDraft {
-		opts.WIP = gitlab.String("no")
+		opts.WIP = gitlab.Ptr("no")
 	}
 
 	if mrExactMatch {

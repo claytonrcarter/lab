@@ -120,8 +120,8 @@ func getBranchMR(rn, branch string) int {
 
 	mrs, err := lab.MRList(rn, gitlab.ListProjectMergeRequestsOptions{
 		State:        &mrState,
-		OrderBy:      gitlab.String("updated_at"),
-		SourceBranch: gitlab.String(mrBranch),
+		OrderBy:      gitlab.Ptr("updated_at"),
+		SourceBranch: gitlab.Ptr(mrBranch),
 	}, -1)
 	if err != nil {
 		log.Fatal(err)
@@ -668,7 +668,7 @@ func getUserID(user string) *int {
 		return nil
 	}
 
-	return gitlab.Int(userID)
+	return gitlab.Ptr(userID)
 }
 
 // getUsers returns the userIDs for use with other GitLab API calls.

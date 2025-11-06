@@ -32,7 +32,7 @@ var mrMergeCmd = &cobra.Command{
 		}
 
 		opts := gitlab.AcceptMergeRequestOptions{
-			MergeWhenPipelineSucceeds: gitlab.Bool(!mergeImmediate),
+			MergeWhenPipelineSucceeds: gitlab.Ptr(!mergeImmediate),
 		}
 
 		err = lab.MRMerge(rn, int(id), &opts)
