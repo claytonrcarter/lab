@@ -275,7 +275,7 @@ func Fork(projID interface{}, opts *gitlab.ForkProjectOptions, useHTTP bool, wai
 		} else if optPath != "" {
 			name = optPath
 		} else {
-			opts.Name = gitlab.String(name)
+			opts.Name = gitlab.Ptr(name)
 		}
 	}
 
@@ -473,7 +473,7 @@ func MRClose(projID interface{}, id int) error {
 		return fmt.Errorf("mr already closed")
 	}
 	_, _, err = lab.MergeRequests.UpdateMergeRequest(projID, int(id), &gitlab.UpdateMergeRequestOptions{
-		StateEvent: gitlab.String("close"),
+		StateEvent: gitlab.Ptr("close"),
 	})
 	if err != nil {
 		return err
@@ -491,7 +491,7 @@ func MRReopen(projID interface{}, id int) error {
 		return fmt.Errorf("mr not closed")
 	}
 	_, _, err = lab.MergeRequests.UpdateMergeRequest(projID, int(id), &gitlab.UpdateMergeRequestOptions{
-		StateEvent: gitlab.String("reopen"),
+		StateEvent: gitlab.Ptr("reopen"),
 	})
 	if err != nil {
 		return err
@@ -708,7 +708,7 @@ func IssueClose(projID interface{}, id int) error {
 		return fmt.Errorf("issue already closed")
 	}
 	_, _, err = lab.Issues.UpdateIssue(projID, id, &gitlab.UpdateIssueOptions{
-		StateEvent: gitlab.String("close"),
+		StateEvent: gitlab.Ptr("close"),
 	})
 	if err != nil {
 		return err
@@ -750,7 +750,7 @@ func IssueReopen(projID interface{}, id int) error {
 		return fmt.Errorf("issue not closed")
 	}
 	_, _, err = lab.Issues.UpdateIssue(projID, id, &gitlab.UpdateIssueOptions{
-		StateEvent: gitlab.String("reopen"),
+		StateEvent: gitlab.Ptr("reopen"),
 	})
 	if err != nil {
 		return err
@@ -1429,7 +1429,7 @@ func CITrigger(projID interface{}, opts gitlab.RunPipelineTriggerOptions) (*gitl
 // for API calls that allow you to reference a user, but only by ID.
 func UserIDFromUsername(username string) (int, error) {
 	us, _, err := lab.Users.ListUsers(&gitlab.ListUsersOptions{
-		Username: gitlab.String(username),
+		Username: gitlab.Ptr(username),
 	})
 	if err != nil || len(us) == 0 {
 		return -1, err
@@ -1441,7 +1441,7 @@ func UserIDFromUsername(username string) (int, error) {
 // for API calls that allow you to reference a user, but only by ID.
 func UserIDFromEmail(email string) (int, error) {
 	us, _, err := lab.Users.ListUsers(&gitlab.ListUsersOptions{
-		Search: gitlab.String(email),
+		Search: gitlab.Ptr(email),
 	})
 	if err != nil || len(us) == 0 {
 		return -1, err
@@ -1606,7 +1606,7 @@ func GetMRApprovalsConfiguration(projID interface{}, id int) (*gitlab.MergeReque
 // ResolveMRDiscussion resolves a discussion (blocking thread) based on its ID
 func ResolveMRDiscussion(projID interface{}, mrID int, discussionID string, noteID int) (string, error) {
 	opts := &gitlab.ResolveMergeRequestDiscussionOptions{
-		Resolved: gitlab.Bool(true),
+		Resolved: gitlab.Ptr(true),
 	}
 
 	discussion, _, err := lab.Discussions.ResolveMergeRequestDiscussion(projID, mrID, discussionID, opts)

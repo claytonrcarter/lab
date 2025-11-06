@@ -344,7 +344,7 @@ func runMRCreate(cmd *cobra.Command, args []string) {
 
 	mrURL, err := lab.MRCreate(sourceProjectName, &gitlab.CreateMergeRequestOptions{
 		SourceBranch:       &sourceBranch,
-		TargetBranch:       gitlab.String(targetBranch),
+		TargetBranch:       gitlab.Ptr(targetBranch),
 		TargetProjectID:    &targetProject.ID,
 		Title:              &title,
 		Description:        &body,

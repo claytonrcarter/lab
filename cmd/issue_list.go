@@ -115,9 +115,9 @@ func issueList(args []string) ([]*gitlab.Issue, error) {
 		issueAssigneeID = gitlab.AssigneeID(*assigneeID)
 	}
 
-	orderBy := gitlab.String(issueOrder)
+	orderBy := gitlab.Ptr(issueOrder)
 
-	sort := gitlab.String(issueSortedBy)
+	sort := gitlab.Ptr(issueSortedBy)
 
 	intIssueAssigneeID, err := strconv.Atoi(fmt.Sprintf("%v", issueAssigneeID))
 	if err != nil {

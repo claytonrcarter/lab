@@ -44,13 +44,13 @@ var projectListCmd = &cobra.Command{
 			ListOptions: gitlab.ListOptions{
 				PerPage: num,
 			},
-			Simple:     gitlab.Bool(true),
-			OrderBy:    gitlab.String("id"),
-			Sort:       gitlab.String("asc"),
-			Owned:      gitlab.Bool(projectListConfig.Owned),
-			Membership: gitlab.Bool(projectListConfig.Membership),
-			Starred:    gitlab.Bool(projectListConfig.Starred),
-			Search:     gitlab.String(search),
+			Simple:     gitlab.Ptr(true),
+			OrderBy:    gitlab.Ptr("id"),
+			Sort:       gitlab.Ptr("asc"),
+			Owned:      gitlab.Ptr(projectListConfig.Owned),
+			Membership: gitlab.Ptr(projectListConfig.Membership),
+			Starred:    gitlab.Ptr(projectListConfig.Starred),
+			Search:     gitlab.Ptr(search),
 		}
 		projects, err := lab.ProjectList(opt, num)
 		if err != nil {
