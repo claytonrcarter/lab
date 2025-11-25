@@ -52,7 +52,7 @@ var projectCreateCmd = &cobra.Command{
 			group = g
 		}
 
-		var namespaceID *int
+		var namespaceID *int64
 		if group != "" {
 			groupObj, err := lab.GroupSearch(group)
 			if err != nil {
@@ -84,7 +84,7 @@ var projectCreateCmd = &cobra.Command{
 			Name:                 gitlab.Ptr(name),
 			Description:          gitlab.Ptr(desc),
 			Visibility:           &visibility,
-			ApprovalsBeforeMerge: gitlab.Ptr(0),
+			ApprovalsBeforeMerge: gitlab.Ptr(int64(0)),
 		}
 		p, err := lab.ProjectCreate(&opts)
 		if err != nil {
