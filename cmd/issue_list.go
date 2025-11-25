@@ -9,9 +9,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rsteube/carapace"
 	"github.com/spf13/cobra"
-	gitlab "gitlab.com/gitlab-org/api/client-go"
 	"github.com/zaquestion/lab/internal/action"
 	lab "github.com/zaquestion/lab/internal/gitlab"
+	gitlab "gitlab.com/gitlab-org/api/client-go"
 )
 
 var (
@@ -25,7 +25,7 @@ var (
 	issueAssignee   string
 	issueAssigneeID *gitlab.AssigneeIDValue
 	issueAuthor     string
-	issueAuthorID   *int
+	issueAuthorID   *int64
 	issueOrder      string
 	issueSortedBy   string
 )
@@ -119,14 +119,14 @@ func issueList(args []string) ([]*gitlab.Issue, error) {
 
 	sort := gitlab.Ptr(issueSortedBy)
 
-	intIssueAssigneeID, err := strconv.Atoi(fmt.Sprintf("%v", issueAssigneeID))
+	intIssueAssigneeID, err := strconv.ParseInt(fmt.Sprintf("%v", issueAssigneeID), 10, 0)
 	if err != nil {
 		log.Fatalf("issueAssigneeID (%s) cannot be converted to int", issueAssigneeID)
 	}
 
 	opts := gitlab.ListProjectIssuesOptions{
 		ListOptions: gitlab.ListOptions{
-			PerPage: num,
+			PerPage: int64(num),
 		},
 		Labels:     &labels,
 		Milestone:  &issueMilestone,
@@ -134,7 +134,7 @@ func issueList(args []string) ([]*gitlab.Issue, error) {
 		OrderBy:    orderBy,
 		Sort:       sort,
 		AuthorID:   issueAuthorID,
-		AssigneeID: &intIssueAssigneeID,
+		AssigneeID: gitlab.AssigneeID(intIssueAssigneeID),
 	}
 
 	if issueExactMatch {
